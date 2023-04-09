@@ -1,4 +1,12 @@
+import './Lessons.dart';
+import './Programs.dart';
+import './programModel.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'LessonsModel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,6 +36,84 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  String link = "https://632017e19f82827dcf24a655.mockapi.io/api/programs";
+  String link1 = "https://632017e19f82827dcf24a655.mockapi.io/api/lessons";
+  List<Programs> allData = [];
+  List<LessonsForYou> allDataLesson = [];
+  late LessonsModel lessonModel;
+  late ProgramModel model;
+
+  @override
+  void initState() {
+    fetchData();
+    super.initState();
+  }
+
+  bool isLoading = false;
+  bool isLessonLoading = false;
+  fetchData() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      var responce = await http.get(Uri.parse(link));
+      print("Status code is ${responce.statusCode}");
+      if (responce.statusCode == 200) {
+        var data = jsonDecode(responce.body);
+        for (var i in data["items"]) {
+          model = ProgramModel(
+            i["name"],
+            i["category"],
+            i["lesson"],
+          );
+          setState(() {
+            allData.add(Programs(model.name, model.category, model.lesson));
+          });
+        }
+        setState(() {
+          isLoading = false;
+        });
+      }
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        print("the problem is $e");
+        showToast("Somthing was wrong!");
+      }
+
+    try {
+      setState(() {
+        isLessonLoading = true;
+      });
+      var responce = await http.get(Uri.parse(link1));
+      print("Status code is ${responce.statusCode}");
+      if (responce.statusCode == 200) {
+        var data = jsonDecode(responce.body);
+        for (var i in data["items"]) {
+          lessonModel = LessonsModel(
+            i["name"],
+            i["category"],
+            i["duration"],
+            i["locked"]
+          );
+          setState(() {
+            allDataLesson.add(LessonsForYou(lessonModel.name, lessonModel.category, lessonModel.duration, lessonModel.lock));
+          });
+        }
+        setState(() {
+          isLessonLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLessonLoading = false;
+      });
+      print("the problem is $e");
+      showToast("Somthing was wrong!");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size = MediaQuery.of(context).size.width;
@@ -36,9 +122,9 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: const Color.fromARGB(255, 242, 244, 245),
         actions: const [
           Icon(
-              Icons.square,
-              color: Colors.grey,
-            ),
+            Icons.square,
+            color: Colors.grey,
+          ),
           Icon(
             Icons.circle,
             color: Colors.grey,
@@ -150,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         margin: EdgeInsets.only(
                             left: Size * 0.02, right: Size * 0.08),
                         width: Size * 0.4,
-                        padding: EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
@@ -276,166 +362,7 @@ class _MyHomePageState extends State<MyHomePage> {
           SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      child: Column(children: [
-                        Image.asset('assets/photo1.png'),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'LIFESTYLE',
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'A complete guide for your',
-                           style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),  
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        const Text(
-                          'new born baby',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '16 Lessons',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 12,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w500,
-                           ),
-                        ),
-                      ]),
-                    ),
-                  ),
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      child: Column(children: [
-                        Image.asset('assets/photo1.png'),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'LIFESTYLE',
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'A complete guide for your',
-                           style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),  
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        const Text(
-                          'new born baby',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '16 Lessons',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 12,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w500,
-                           ),
-                        ),
-                      ]),
-                    ),
-                  ),
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      child: Column(children: [
-                        Image.asset('assets/photo1.png'),
-                        SizedBox(height: 4),
-                        const Text(
-                          'LIFESTYLE',
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'A complete guide for your',
-                           style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),  
-                        ),
-                        const SizedBox(
-                          height: 2,
-                        ),
-                        const Text(
-                          'new born baby',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 16,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w700,
-                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          '16 Lessons',
-                          style: TextStyle(
-                             fontFamily: 'inter',
-                             fontSize: 12,
-                             fontStyle: FontStyle.normal,
-                             fontWeight: FontWeight.w500,
-                           ),
-                        ),
-                      ]),
-                    ),
-                  ),
-                ],
-              )),
+              child: Row(children: allData)),
           const SizedBox(
             height: 80,
           ),
@@ -478,46 +405,39 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 4),
                       const Text(
                         'BABYCARE',
-                         style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
                         style: TextStyle(
+                            color: Colors.blue,
+                            fontFamily: 'inter',
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Understanding of human',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                        
-                        ),
+                              fontSize: 16)),
                       const SizedBox(
                         height: 2,
                       ),
-                      const Text(
-                        'behaviour',
-                         style: TextStyle(
+                      const Text('behaviour',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
+                              fontSize: 16)),
                       SizedBox(height: 4),
                       Row(
                         children: [
-                          const Text(
-                            '13 Feb, Sunday',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12)
-                          ),
+                          const Text('13 Feb, Sunday',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontFamily: 'inter',
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12)),
                           const SizedBox(width: 15),
                           Container(
                             width: 60,
@@ -528,15 +448,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               border: Border.all(color: Colors.blue),
                             ),
                             child: const Center(
-                              child: Text(
-                                'Book',
-                                 style: TextStyle(
-                                    fontFamily: 'inter',
-                                    color: Colors.blue,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                 ),
-                              )),
+                                child: Text(
+                              'Book',
+                              style: TextStyle(
+                                fontFamily: 'inter',
+                                color: Colors.blue,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
                           )
                         ],
                       ),
@@ -550,46 +470,39 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 4),
                       const Text(
                         'BABYCARE',
-                         style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
                         style: TextStyle(
+                            color: Colors.blue,
+                            fontFamily: 'inter',
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Understanding of human',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                        
-                        ),
+                              fontSize: 16)),
                       const SizedBox(
                         height: 2,
                       ),
-                      const Text(
-                        'behaviour',
-                         style: TextStyle(
+                      const Text('behaviour',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
+                              fontSize: 16)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Text(
-                            '13 Feb, Sunday',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12)
-                          ),
+                          const Text('13 Feb, Sunday',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontFamily: 'inter',
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12)),
                           const SizedBox(width: 15),
                           Container(
                             width: 60,
@@ -600,15 +513,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               border: Border.all(color: Colors.blue),
                             ),
                             child: const Center(
-                              child: Text(
-                                'Book',
-                                 style: TextStyle(
-                                    fontFamily: 'inter',
-                                    color: Colors.blue,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                 ),
-                              )),
+                                child: Text(
+                              'Book',
+                              style: TextStyle(
+                                fontFamily: 'inter',
+                                color: Colors.blue,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
                           )
                         ],
                       ),
@@ -622,46 +535,39 @@ class _MyHomePageState extends State<MyHomePage> {
                       const SizedBox(height: 4),
                       const Text(
                         'BABYCARE',
-                         style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12),
-                        ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
                         style: TextStyle(
+                            color: Colors.blue,
+                            fontFamily: 'inter',
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text('Understanding of human',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                        
-                        ),
+                              fontSize: 16)),
                       const SizedBox(
                         height: 2,
                       ),
-                      const Text(
-                        'behaviour',
-                         style: TextStyle(
+                      const Text('behaviour',
+                          style: TextStyle(
                               fontFamily: 'inter',
                               fontStyle: FontStyle.normal,
                               fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
+                              fontSize: 16)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Text(
-                            '13 Feb, Sunday',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12)
-                          ),
+                          const Text('13 Feb, Sunday',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontFamily: 'inter',
+                                  fontStyle: FontStyle.normal,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12)),
                           const SizedBox(width: 15),
                           Container(
                             width: 60,
@@ -672,15 +578,15 @@ class _MyHomePageState extends State<MyHomePage> {
                               border: Border.all(color: Colors.blue),
                             ),
                             child: const Center(
-                              child: Text(
-                                'Book',
-                                 style: TextStyle(
-                                    fontFamily: 'inter',
-                                    color: Colors.blue,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                 ),
-                              )),
+                                child: Text(
+                              'Book',
+                              style: TextStyle(
+                                fontFamily: 'inter',
+                                color: Colors.blue,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            )),
                           )
                         ],
                       ),
@@ -725,206 +631,34 @@ class _MyHomePageState extends State<MyHomePage> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.all(12),
               child: Row(
-                children: [
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Column(children: [
-                      Image.asset('assets/photo2.png'),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'BABYCARE',
-                        style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      const Text(
-                        'behaviour',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: const Text(
-                              '3 min',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'inter',
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12)
-                            ),
-                          ),
-                          Container(margin: const EdgeInsets.only(bottom: 8)  ,child: const SizedBox(width: 25)),
-                          Container(margin: const EdgeInsets.only(bottom: 8)  ,child: const Icon(Icons.lock))
-                        ],
-                      ),
-                    ]),
-                  ),
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Column(children: [
-                      Image.asset('assets/photo2.png'),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'BABYCARE',
-                        style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      const Text(
-                        'behaviour',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            child: const Text(
-                              '3 min',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'inter',
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12)
-                            ),
-                          ),
-                          Container(margin: const EdgeInsets.only(bottom: 8)  ,child: const SizedBox(width: 25)),
-                          Container(margin: const EdgeInsets.only(bottom: 8)  ,child: const Icon(Icons.lock))
-                        ],
-                      ),
-                    ]),
-                  ),
-                  Card(
-                    elevation: 5,
-                    color: Colors.white,
-                    child: Column(children: [
-                      Image.asset('assets/photo2.png'),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'BABYCARE',
-                        style: TextStyle(
-                              color: Colors.blue,
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Understanding of human',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16)
-                      ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      const Text(
-                        'behaviour',
-                        style: TextStyle(
-                              fontFamily: 'inter',
-                              fontStyle: FontStyle.normal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12)
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(bottom: 8),
-                            child: const Text(
-                              '3 min',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontFamily: 'inter',
-                                fontStyle: FontStyle.normal,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12)
-                            ),
-                          ),
-                          Container(margin: const EdgeInsets.only(bottom: 8) ,child: const SizedBox(width: 25)),
-                          Container(margin: const EdgeInsets.only(bottom: 8)  ,child: const Icon(Icons.lock))
-                        ],
-                      ),
-                    ]),
-                  ),
-                ],
+                //alldataLesson
+                children: allDataLesson 
+                //alldataLesson here 
               )),
         ]),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-            backgroundColor: Colors.blue
-          ),
+              icon: Icon(Icons.home),
+              label: 'Home',
+              backgroundColor: Colors.blue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Learn',
-            backgroundColor: Colors.blue
-          ),
+              icon: Icon(Icons.book),
+              label: 'Learn',
+              backgroundColor: Colors.blue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.hub),
-            label: 'Hub',
-            backgroundColor: Colors.blue
-          ),
+              icon: Icon(Icons.hub),
+              label: 'Hub',
+              backgroundColor: Colors.blue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Chat',
-            backgroundColor: Colors.blue
-          ),
+              icon: Icon(Icons.chat),
+              label: 'Chat',
+              backgroundColor: Colors.blue),
           BottomNavigationBarItem(
-            icon: Icon(Icons.picture_as_pdf_outlined),
-            label: 'Profile',
-            backgroundColor: Colors.blue
-          ),
+              icon: Icon(Icons.picture_as_pdf_outlined),
+              label: 'Profile',
+              backgroundColor: Colors.blue),
         ],
         // currentIndex: _selectedIndex,
         // selectedItemColor: Colors.blue
@@ -932,4 +666,15 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+showToast(String title) {
+  return Fluttertoast.showToast(
+      msg: "${title}",
+      //toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER_LEFT,
+      timeInSecForIosWeb: 3,
+      backgroundColor: Colors.blue,
+      textColor: Colors.white,
+      fontSize: 16.0);
 }
